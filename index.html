@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ALT-198 Maintenance Check List</title>
+<style>
+  :root{
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --text:#1f2937;
+    --muted:#667085;
+    --line:#d9e1ea;
+    --primary:#174a7e;
+    --primary2:#2367a5;
+    --ok:#eaf7ee;
+    --ok-border:#6fb985;
+    --attn:#fff3e5;
+    --attn-border:#e89b47;
+    --danger:#b42318;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+  }
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+    padding:18px 14px 44px;
+  }
+  .header{
+    background:linear-gradient(135deg,var(--primary),var(--primary2));
+    color:white;
+    padding:22px 20px;
+    border-radius:18px;
+    box-shadow:0 10px 30px rgba(31,72,120,.16);
+  }
+  .header h1{
+    margin:0;
+    font-size:24px;
+    line-height:1.25;
+    letter-spacing:.2px;
+  }
+  .header p{
+    margin:6px 0 0;
+    opacity:.9;
+    font-size:14px;
+  }
+  .machine-card{
+    margin-top:14px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:16px;
+  }
+  .machine-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+  }
+  .field-label{
+    display:block;
+    font-size:12px;
+    color:var(--muted);
+    margin-bottom:5px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.35px;
+  }
+  input, textarea{
+    width:100%;
+    border:1px solid #cfd8e3;
+    border-radius:10px;
+    padding:11px 12px;
+    font-size:15px;
+    background:white;
+  }
+  input[readonly]{
+    background:#f8fafc;
+    font-weight:700;
+  }
+  .section-title{
+    margin:24px 2px 10px;
+    font-size:17px;
+    font-weight:800;
+  }
+  .scope{
+    background:white;
+    border:1px solid var(--line);
+    border-radius:14px;
+    margin-bottom:11px;
+    overflow:hidden;
+    transition:.2s ease;
+  }
+  .scope.attention{
+    border-color:var(--attn-border);
+    box-shadow:0 0 0 2px rgba(232,155,71,.08);
+  }
+  .scope-head{
+    width:100%;
+    appearance:none;
+    border:0;
+    background:white;
+    padding:15px 16px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    text-align:left;
+    cursor:pointer;
+  }
+  .scope-name{
+    font-weight:800;
+    font-size:16px;
+  }
+  .chev{
+    color:var(--muted);
+    font-size:18px;
+    transition:.2s ease;
+  }
+  .scope.open .chev{transform:rotate(180deg)}
+  .details{
+    display:none;
+    padding:0 16px 14px;
+  }
+  .scope.open .details{display:block}
+  .actions{
+    background:#f8fafc;
+    border:1px solid #e8edf3;
+    border-radius:10px;
+    padding:11px 13px;
+    margin-bottom:12px;
+  }
+  .actions strong{
+    display:block;
+    font-size:12px;
+    color:var(--primary);
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  .actions ul{
+    margin:0;
+    padding-left:18px;
+    color:#475467;
+    font-size:13px;
+    line-height:1.55;
+  }
+  .choice-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .choice{
+    border:1px solid #cfd8e3;
+    background:white;
+    padding:11px;
+    border-radius:10px;
+    font-weight:800;
+    cursor:pointer;
+    font-size:14px;
+  }
+  .choice.ok.active{
+    background:var(--ok);
+    border-color:var(--ok-border);
+  }
+  .choice.attn.active{
+    background:var(--attn);
+    border-color:var(--attn-border);
+  }
+  .form-card{
+    background:white;
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:16px;
+    margin-top:12px;
+  }
+  .grid2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .hint{
+    margin-top:6px;
+    font-size:12px;
+    color:var(--muted);
+  }
+  .required-note{
+    display:none;
+    color:var(--danger);
+    font-weight:700;
+    font-size:12px;
+    margin-top:6px;
+  }
+  .signature-canvas{
+    width:100%;
+    height:160px;
+    border:2px solid #b9c5d3;
+    border-radius:12px;
+    display:block;
+    margin-top:7px;
+    background:#ffffff;
+    touch-action:none;
+    cursor:crosshair;
+  }
+  .clear-btn{
+    margin-top:8px;
+    background:white;
+    border:1px solid #cfd8e3;
+    border-radius:9px;
+    padding:8px 12px;
+    font-weight:700;
+    color:#475467;
+  }
+  .submit{
+    width:100%;
+    margin-top:18px;
+    border:0;
+    border-radius:12px;
+    padding:14px 16px;
+    font-size:16px;
+    font-weight:800;
+    background:var(--primary);
+    color:white;
+    cursor:pointer;
+  }
+  .footer-note{
+    text-align:center;
+    margin-top:10px;
+    font-size:12px;
+    color:var(--muted);
+  }
+  @media(max-width:620px){
+    .machine-grid,.grid2{grid-template-columns:1fr}
+    .header h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <h1>ALT-198 Maintenance Check List</h1>
+    <p>Digital maintenance inspection form</p>
+  </div>
+
+  <div class="machine-card">
+    <div class="machine-grid" style="grid-template-columns:repeat(2,1fr)">
+      <div>
+        <label class="field-label">Machine No.</label>
+        <input id="machineNumber" value="ALT-198" readonly>
+      </div>
+      <div>
+        <label class="field-label">S/N</label>
+        <input id="serialNumber" value="30004746-01" readonly>
+      </div>
+    </div>
+    <div style="margin-top:12px;max-width:240px">
+      <label class="field-label">Inspection Date</label>
+      <input id="inspectionDate" type="date">
+    </div>
+  </div>
+
+  <div class="section-title">Maintenance Scope</div>
+
+  <div id="scopeList"></div>
+
+  <div class="form-card">
+    <label class="field-label">Action Taken <span style="text-transform:none;font-weight:500">(if applicable)</span></label>
+    <textarea id="actionTaken" rows="4" placeholder="Describe the action taken if any item requires attention"></textarea>
+    <div class="required-note" id="actionRequired">Action Taken is required because at least one scope is marked Attention.</div>
+  </div>
+
+  <div class="form-card">
+    <div class="grid2">
+      <div>
+        <label class="field-label">Inspected By</label>
+        <input id="inspectedBy" placeholder="Inspector name" autocomplete="name">
+      </div>
+      <div>
+        <label class="field-label">Employee No.</label>
+        <input id="employeeNo" placeholder="Employee number">
+      </div>
+    </div>
+
+    <div style="margin-top:14px">
+      <label class="field-label">Signature</label>
+      <canvas id="signaturePad" class="signature-canvas"></canvas>
+      <button class="clear-btn" type="button" id="clearSignature">Clear Signature</button>
+    </div>
+  </div>
+
+  <button class="submit" type="button" onclick="previewSubmit()">Submit Maintenance Record</button>
+  <div id="status" class="footer-note">Submitted time will be recorded automatically in 24-hour format.</div>
+
+</div>
+
+<script>
+const scopes = [
+  {
+    name:"Motor",
+    actions:[
+      "Visual inspection.",
+      "No accumulated dust around motor. Cleaning with air gun.",
+      "Tightening connecting nut and lubricating.",
+      "Make sure no abnormal noise from motor during run."
+    ]
+  },
+  {
+    name:"Motor Drive",
+    actions:[
+      "Visual inspection.",
+      "No accumulated dust around motor drive.",
+      "Cleaning with air gun.",
+      "Make sure no abnormal noise from motor drive during run."
+    ]
+  },
+  {
+    name:"Load Bank",
+    actions:[
+      "Visual inspection.",
+      "No accumulated dust inside load bank.",
+      "Cleaning with air gun.",
+      "Make sure no abnormal noise from load bank during run."
+    ]
+  },
+  {
+    name:"Battery Clamp and Cable Condition",
+    actions:[
+      "Tester should be inspected for worn cables and connections.",
+      "Cables and tester clips should be replaced/repaired when noticeably worn or loose connections.",
+      "Check using: 1. Visual  2. Multimeter"
+    ]
+  },
+  {
+    name:"Interior and Printed Circuits Boards",
+    actions:[
+      "Visual inspection.",
+      "No accumulated dust around boards.",
+      "Cleaning with air gun."
+    ]
+  },
+  {
+    name:"Exterior",
+    actions:[
+      "Visual inspection.",
+      "No accumulated dust.",
+      "Cleaning with air gun."
+    ]
+  },
+  {
+    name:"Touch Screen Monitor Display",
+    actions:[
+      "Visual inspection.",
+      "Data is clearly observed. Touch screen is functioning.",
+      "Cleaning with clean cloth."
+    ]
+  },
+  {
+    name:"Grease Fittings",
+    actions:[
+      "Visual inspection and checking."
+    ]
+  }
+];
+
+const list = document.getElementById("scopeList");
+const state = {};
+
+scopes.forEach((scope, idx)=>{
+  const box = document.createElement("div");
+  box.className = "scope";
+  box.innerHTML = `
+    <button type="button" class="scope-head">
+      <span class="scope-name">${scope.name}</span>
+      <span class="chev">⌄</span>
+    </button>
+    <div class="details">
+      <div class="actions">
+        <strong>Inspection / Maintenance Actions</strong>
+        <ul>${scope.actions.map(a=>`<li>${a}</li>`).join("")}</ul>
+      </div>
+      <div class="choice-row">
+        <button type="button" class="choice ok">OK</button>
+        <button type="button" class="choice attn">Attention</button>
+      </div>
+    </div>
+  `;
+
+  box.querySelector(".scope-head").addEventListener("click",()=>{
+    box.classList.toggle("open");
+  });
+
+  const ok = box.querySelector(".ok");
+  const attn = box.querySelector(".attn");
+
+  function advanceToNextScope() {
+    box.classList.remove("open");
+
+    const nextScope = list.children[idx + 1];
+
+    if (nextScope) {
+      nextScope.classList.add("open");
+
+      setTimeout(() => {
+        nextScope.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+      }, 150);
+    } else {
+      setTimeout(() => {
+        document.getElementById("actionTaken").scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+      }, 150);
+    }
+  }
+
+  ok.addEventListener("click",()=>{
+    state[idx] = "OK";
+    ok.classList.add("active");
+    attn.classList.remove("active");
+    box.classList.remove("attention");
+    updateActionRule();
+    advanceToNextScope();
+  });
+
+  attn.addEventListener("click",()=>{
+    state[idx] = "Attention";
+    attn.classList.add("active");
+    ok.classList.remove("active");
+    box.classList.add("attention");
+    updateActionRule();
+    advanceToNextScope();
+  });
+
+  list.appendChild(box);
+});
+
+// Open the first maintenance scope automatically when the page loads.
+if (list.children.length > 0) {
+  list.children[0].classList.add("open");
+}
+
+function updateActionRule(){
+  const anyAttention = Object.values(state).includes("Attention");
+  const ta = document.getElementById("actionTaken");
+  const note = document.getElementById("actionRequired");
+  ta.required = anyAttention;
+  note.style.display = anyAttention ? "block" : "none";
+}
+
+document.getElementById("inspectionDate").value =
+  new Date().toISOString().slice(0,10);
+
+
+const canvas = document.getElementById("signaturePad");
+const ctx = canvas.getContext("2d");
+let drawing = false;
+let hasSignature = false;
+
+function resizeSignatureCanvas() {
+  const rect = canvas.getBoundingClientRect();
+  const ratio = Math.max(window.devicePixelRatio || 1, 1);
+
+  const oldImage = document.createElement("canvas");
+  oldImage.width = canvas.width;
+  oldImage.height = canvas.height;
+  oldImage.getContext("2d").drawImage(canvas, 0, 0);
+
+  canvas.width = rect.width * ratio;
+  canvas.height = rect.height * ratio;
+
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  ctx.lineWidth = 2;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.strokeStyle = "#111827";
+
+  if (hasSignature && oldImage.width && oldImage.height) {
+    ctx.drawImage(oldImage, 0, 0, rect.width, rect.height);
+  }
+}
+
+function getPoint(e) {
+  const rect = canvas.getBoundingClientRect();
+  const p = e.touches ? e.touches[0] : e;
+  return {
+    x: p.clientX - rect.left,
+    y: p.clientY - rect.top
+  };
+}
+
+function startDrawing(e) {
+  e.preventDefault();
+  drawing = true;
+  const p = getPoint(e);
+  ctx.beginPath();
+  ctx.moveTo(p.x, p.y);
+}
+
+function draw(e) {
+  if (!drawing) return;
+  e.preventDefault();
+  const p = getPoint(e);
+  ctx.lineTo(p.x, p.y);
+  ctx.stroke();
+  hasSignature = true;
+}
+
+function stopDrawing(e) {
+  if (!drawing) return;
+  e.preventDefault();
+  drawing = false;
+  ctx.closePath();
+}
+
+canvas.addEventListener("mousedown", startDrawing);
+canvas.addEventListener("mousemove", draw);
+window.addEventListener("mouseup", stopDrawing);
+
+canvas.addEventListener("touchstart", startDrawing, { passive:false });
+canvas.addEventListener("touchmove", draw, { passive:false });
+canvas.addEventListener("touchend", stopDrawing, { passive:false });
+
+document.getElementById("clearSignature").addEventListener("click", () => {
+  const rect = canvas.getBoundingClientRect();
+  ctx.clearRect(0, 0, rect.width, rect.height);
+  hasSignature = false;
+});
+
+function getSignaturePng() {
+  const exportCanvas = document.createElement("canvas");
+  exportCanvas.width = canvas.width;
+  exportCanvas.height = canvas.height;
+  const exportContext = exportCanvas.getContext("2d");
+  exportContext.fillStyle = "#ffffff";
+  exportContext.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+  exportContext.drawImage(canvas, 0, 0);
+  return exportCanvas.toDataURL("image/png");
+}
+
+window.addEventListener("resize", resizeSignatureCanvas);
+setTimeout(resizeSignatureCanvas, 50);
+
+const SUBMIT_ENDPOINT = "https://default7f048fc12ea348e4ac9291d1eb0980.7c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/29/workflows/6148a9a6f75a422099fa207eedb35de3/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=KDGNqv_8wAXG-n6KYiFu2LvDx-Em2oPM_A5iBFNs4KQ"; // Step 3: paste the Power Automate HTTP URL here.
+
+function getMalaysiaDateTimeParts() {
+  const now = new Date();
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kuala_Lumpur",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23"
+  }).formatToParts(now);
+
+  const obj = {};
+  parts.forEach(p => {
+    if (p.type !== "literal") obj[p.type] = p.value;
+  });
+
+  return {
+    date: `${obj.year}-${obj.month}-${obj.day}`,
+    time: `${obj.hour}:${obj.minute}:${obj.second}`
+  };
+}
+
+async function previewSubmit(){
+  const anyAttention = Object.values(state).includes("Attention");
+  const action = document.getElementById("actionTaken").value.trim();
+  const inspectedBy = document.getElementById("inspectedBy").value.trim();
+  const employeeNo = document.getElementById("employeeNo").value.trim();
+  const status = document.getElementById("status");
+
+  if(Object.keys(state).length !== scopes.length){
+    alert("Please select OK or Attention for every maintenance scope.");
+    return;
+  }
+
+  if(anyAttention && !action){
+    document.getElementById("actionTaken").focus();
+    return;
+  }
+
+  if(!inspectedBy){
+    document.getElementById("inspectedBy").focus();
+    alert("Please enter Inspected By.");
+    return;
+  }
+
+  if(!employeeNo){
+    document.getElementById("employeeNo").focus();
+    alert("Please enter Employee No.");
+    return;
+  }
+
+  if(!hasSignature){
+    alert("Please provide your signature before submitting.");
+    return;
+  }
+
+  const dt = getMalaysiaDateTimeParts();
+
+  const payload = {
+    machineNumber: document.getElementById("machineNumber").value,
+    serialNumber: document.getElementById("serialNumber").value,
+    inspectionDate: document.getElementById("inspectionDate").value || dt.date,
+    submittedTime: dt.time,
+    motor: state[0],
+    motorDrive: state[1],
+    loadBank: state[2],
+    batteryClampCableCondition: state[3],
+    interiorPrintedCircuitBoards: state[4],
+    exterior: state[5],
+    touchScreenMonitorDisplay: state[6],
+    greaseFittings: state[7],
+    actionTaken: action,
+    inspectedBy: inspectedBy,
+    employeeNo: employeeNo,
+    signaturePng: getSignaturePng()
+  };
+
+  if(!SUBMIT_ENDPOINT){
+    console.log("Payload ready for Step 3:", payload);
+    alert("The ALT-198 form is ready. In Step 3 we will connect it to Power Automate.");
+    return;
+  }
+
+  try {
+    status.textContent = "Submitting...";
+    await fetch(SUBMIT_ENDPOINT, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {"Content-Type":"text/plain;charset=UTF-8"},
+      body: JSON.stringify(payload)
+    });
+
+    document.body.innerHTML = `
+      <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f4f7fb;padding:24px;font-family:Arial,Helvetica,sans-serif">
+        <div style="max-width:520px;width:100%;background:white;border:1px solid #d9e1ea;border-radius:18px;padding:34px;text-align:center;box-shadow:0 10px 30px rgba(31,72,120,.12)">
+          <div style="font-size:46px;margin-bottom:10px">✓</div>
+          <h2 style="margin:0 0 8px;color:#174a7e">Record Submitted</h2>
+          <p style="margin:0;color:#667085;line-height:1.6">The ALT-198 maintenance record has been submitted successfully.<br>Please close this browser tab.</p>
+        </div>
+      </div>`;
+  } catch (error) {
+    console.error(error);
+    status.textContent = "Submission failed. Check the internet connection.";
+    status.style.color = "#b42318";
+  }
+}
+</script>
+</body>
+</html>
